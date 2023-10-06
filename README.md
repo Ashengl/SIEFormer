@@ -92,9 +92,10 @@ class Attention(nn.Module):
   </code></pre>
 </details>
 
+* Start your SaF
 
 ## Train
-Then if you wish to try training our model from SaF, please run contrastive_training, for example:
+If you wish to try training our model from SaF, please run contrastive_training, for example:
 <details>
   <summary>script</summary>
   <pre><code>
@@ -115,6 +116,17 @@ python -m methods.contrastive_training.contrastive_training \
   </code></pre>
 </details>
 
+Or, just change your script as:
+<details>
+  <summary>code</summary>
+  <pre><code>
+    batch_size = 40
+    learning_rate = 0.0005
+    sup_con_weight = 0.35 for generic dataset, 
+                     1.0 for fine-grained dataset
+    weight_decay = 5e-7
+  </code></pre>
+</details>
 
 ## Acknowledgement
 
