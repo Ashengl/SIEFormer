@@ -1,5 +1,5 @@
-# SaF
-Frequency-aware Fine-tuning for Generalized Category Discovery
+# SIEFormer
+Spectral-Interpretable and -Enhanced Transformer for Generalized Category Discovery
 
 ## Installation
 ```shell
