@@ -41,7 +41,6 @@ class Attention(nn.Module):
         self.proj_drop = nn.Dropout(proj_drop)
         self.ac = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
-
     def forward(self, x):
         B, N, C = x.shape  # 48, 768, 197
         qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)  # 3, 48, 12, 197, 64
@@ -49,7 +48,6 @@ class Attention(nn.Module):
         attn = (q @ k.transpose(-2, -1)) * self.scale  # 48, 12, 197, 197
         attn = attn.softmax(dim=-1)
         attn = self.attn_drop(attn)  # 48, 12, 197, 197
-
         attn_hat = (q.transpose(1, 2).reshape(B, N, C) @ k.transpose(2, 3).reshape(B, C, N))
         attn_hat = (attn_hat + attn_hat.transpose(1, 2))/2
         attn_hat = self.ac(attn_hat)
@@ -59,15 +57,12 @@ class Attention(nn.Module):
         I = torch.eye(Norm_attn_hat.size(1)).cuda().unsqueeze(0)
         L = I - Norm_attn_hat  # 0,2
         L_2 = torch.bmm(L - I, L - I)
-
         out = self.proj_v1(torch.bmm(L_2 - I, v.contiguous().transpose(1, 2).reshape(B, N, C)))
         out = out - self.proj_v2(torch.bmm(L_2, v.contiguous().transpose(1, 2).reshape(B, N, C)))
-
         fft_v = torch.fft.rfft(v.contiguous(), dim=3, norm='ortho')
         weight = torch.view_as_complex(self.complex_weight)
         fft_v = fft_v * weight
         ifft_v = torch.fft.irfft(fft_v, dim=3, norm='ortho')
-
         x = (attn @ ifft_v).transpose(1, 2).reshape(B, N, C)  # 48, 768, 197
         x = self.proj(x)
         x = self.proj_drop(x)
