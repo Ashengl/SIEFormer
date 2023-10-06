@@ -21,7 +21,7 @@ The split of datasets follows [GCD](https://github.com/sgvaze/generalized-catego
   <pre><code>[0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 16, 18, 19, 20, 21, 22, 24, 26, 28, 29, 32, 33, 34, 35, 36, 38, 39, 41, 42, 46, 48, 50, 52, 54, 55, 56, 57, 59, 60, 61, 64, 65, 66, 67, 68, 70, 71, 72, 73, 74, 75, 76, 77, 78, 80, 81, 83, 84, 88, 89, 90, 91, 92, 93, 94, 96, 97, 99, 100, 104, 106, 107, 108, 110, 111, 112, 113, 115, 116, 117, 118, 119, 123, 124, 125, 127, 129, 130, 133, 134, 135, 137, 138, 140, 141, 143, 144, 146, 150]</p></code></pre>
 </details>
 
-## How to start SAF with [GCD](https://github.com/sgvaze/generalized-category-discovery)
+## How to start SIEFormer with [GCD](https://github.com/sgvaze/generalized-category-discovery)
 * Replace **vision_transformer.py** with the provided model or change the calculation of Attention to:
 <details>
   <summary>code</summary>
@@ -92,10 +92,10 @@ class Attention(nn.Module):
   </code></pre>
 </details>
 
-* Start your SaF
+* Start your SIEFormer
 
 ## Train
-If you wish to try training your SaF, please run contrastive_training, for example:
+If you wish to try training your SIEFormer, please run contrastive_training, for example:
 <details>
   <summary>script</summary>
   <pre><code>
