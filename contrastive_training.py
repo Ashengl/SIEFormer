@@ -10,7 +10,7 @@ from project_utils.cluster_utils import mixed_eval, AverageMeter
 from models import vision_transformer as vits
 
 from project_utils.general_utils import init_experiment, get_mean_lr, str2bool, get_dino_head_weights
-import torch.nn as nn
+
 from data.augmentations import get_transform
 from data.get_datasets import get_datasets, get_class_splits
 
@@ -176,6 +176,7 @@ def train(projection_head, model, train_loader, test_loader, unlabelled_train_lo
 
     sup_con_crit = SupConLoss()
     best_test_acc_lab = 0
+
     for epoch in range(args.epochs):
 
         loss_record = AverageMeter()
@@ -183,8 +184,8 @@ def train(projection_head, model, train_loader, test_loader, unlabelled_train_lo
 
         projection_head.train()
         model.train()
-        tbar = tqdm(train_loader)
-        for batch_idx, batch in enumerate(tbar):
+
+        for batch_idx, batch in enumerate(tqdm(train_loader)):
 
             images, class_labels, uq_idxs, mask_lab = batch
             mask_lab = mask_lab[:, 0]
@@ -194,6 +195,7 @@ def train(projection_head, model, train_loader, test_loader, unlabelled_train_lo
 
             # Extract features with base model
             features = model(images)
+
             # Pass features through projection head
             features = projection_head(features)
 
@@ -221,6 +223,7 @@ def train(projection_head, model, train_loader, test_loader, unlabelled_train_lo
 
             # Total loss
             loss = (1 - args.sup_con_weight) * contrastive_loss + args.sup_con_weight * sup_con_loss
+
             # Train acc
             _, pred = contrastive_logits.max(1)
             acc = (pred == contrastive_labels).float().mean().item()
@@ -230,12 +233,14 @@ def train(projection_head, model, train_loader, test_loader, unlabelled_train_lo
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            tbar.set_postfix_str(f"loss : {loss.item()}, sup_loss: {sup_con_loss}")
+
 
         print('Train Epoch: {} Avg Loss: {:.4f} | Seen Class Acc: {:.4f} '.format(epoch, loss_record.avg,
                                                                                   train_acc_record.avg))
 
+
         with torch.no_grad():
+
             print('Testing on unlabelled examples in the training data...')
             all_acc, old_acc, new_acc = test_kmeans(model, unlabelled_train_loader,
                                                     epoch=epoch, save_name='Train ACC Unlabelled',
@@ -327,7 +332,6 @@ def test_kmeans(model, test_loader,
     return all_acc, old_acc, new_acc
 
 
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
@@ -339,20 +343,21 @@ if __name__ == "__main__":
 
     parser.add_argument('--warmup_model_dir', type=str, default=None)
     parser.add_argument('--model_name', type=str, default='vit_dino', help='Format is {model_name}_{pretrain}')
-    parser.add_argument('--dataset_name', type=str, default='scars', help='options: cifar10, cifar100, scars aircraft')
+    parser.add_argument('--dataset_name', type=str, default='cub', help='options: cifar10, cifar100, scars')
     parser.add_argument('--prop_train_labels', type=float, default=0.5)
-    parser.add_argument('--use_ssb_splits', type=str2bool, default=True)
+    parser.add_argument('--use_ssb_splits', type=str2bool, default=False)
+
     parser.add_argument('--grad_from_block', type=int, default=11)
     parser.add_argument('--lr', type=float, default=0.0005)
     parser.add_argument('--save_best_thresh', type=float, default=None)
     parser.add_argument('--gamma', type=float, default=0.1)
     parser.add_argument('--momentum', type=float, default=0.9)
     parser.add_argument('--weight_decay', type=float, default=5e-7)
-    parser.add_argument('--epochs', default=200, type=int)  # 100
+    parser.add_argument('--epochs', default=200, type=int)
     parser.add_argument('--exp_root', type=str, default=exp_root)
     parser.add_argument('--transform', type=str, default='imagenet')
     parser.add_argument('--seed', default=1, type=int)
-    parser.add_argument('--devices', default=None, type=str)
+
     parser.add_argument('--base_model', type=str, default='vit_dino')
     parser.add_argument('--temperature', type=float, default=1.0)
     parser.add_argument('--sup_con_weight', type=float, default=1.0)
@@ -383,15 +388,12 @@ if __name__ == "__main__":
 
         model = vits.__dict__['vit_base']()
 
-        # model.half()
-
         state_dict = torch.load(pretrain_path, map_location='cpu')
         model.load_state_dict(state_dict, strict=False)
-        # model.load_state_dict(state_dict['state_dict'], strict=False)
 
         if args.warmup_model_dir is not None:
             print(f'Loading weights from {args.warmup_model_dir}')
-            # model.load_state_dict(torch.load(args.warmup_model_dir, map_location='cpu'))
+            model.load_state_dict(torch.load(args.warmup_model_dir, map_location='cpu'))
 
         model.to(device)
 
@@ -415,7 +417,7 @@ if __name__ == "__main__":
                     m.requires_grad = True
                 if 'proj_v' in name:
                     m.requires_grad = True
-                    nn.init.zeros_(m)
+                    torch.nn.init.zeros_(m)
                 if 'complex' in name:
                     m.requires_grad = True
 
@@ -454,9 +456,9 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_dataset, num_workers=args.num_workers, batch_size=args.batch_size, shuffle=False,
                               sampler=sampler, drop_last=True)
     test_loader_unlabelled = DataLoader(unlabelled_train_examples_test, num_workers=args.num_workers,
-                                        batch_size=128, shuffle=False)
+                                        batch_size=args.batch_size, shuffle=False)
     test_loader_labelled = DataLoader(test_dataset, num_workers=args.num_workers,
-                                      batch_size=128, shuffle=False)
+                                      batch_size=args.batch_size, shuffle=False)
 
     # ----------------------
     # PROJECTION HEAD
@@ -465,12 +467,6 @@ if __name__ == "__main__":
                                out_dim=args.mlp_out_dim, nlayers=args.num_mlp_layers)
     projection_head.to(device)
 
-    ### parallelism
-
-    if args.devices is not None:
-        device_list = [int(x) for x in args.devices.split(',')]
-        model = nn.DataParallel(model, device_ids=device_list)
-        projection_head = nn.DataParallel(projection_head, device_ids=device_list)
     # ----------------------
     # TRAIN
     # ----------------------
