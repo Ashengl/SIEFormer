@@ -95,7 +95,7 @@ class Attention(nn.Module):
 * Start your SaF
 
 ## Train
-If you wish to try training our model from SaF, please run contrastive_training, for example:
+If you wish to try training your SaF, please run contrastive_training, for example:
 <details>
   <summary>script</summary>
   <pre><code>
