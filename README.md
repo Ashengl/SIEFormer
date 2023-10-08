@@ -71,7 +71,7 @@ class Attention(nn.Module):
 </details>
 
 * Replace **contrastive_training.py** with the provided training code 
-    * or set parameters **require_grad = True**:
+    * or set parameters **require_grad = True** and set **load_state_dict_strict=False**:
     <details>
       <summary>code</summary>
       <pre><code>
@@ -85,13 +85,7 @@ class Attention(nn.Module):
                         torch.nn.init.zeros_(m)
                     if 'complex' in name:
                         m.requires_grad = True
-      </code></pre>
-    </details>
-    * and set **load_state_dict_strict=False**:
-    <details>
-      <summary>code</summary>
-      <pre><code>
-        model.load_state_dict(state_dict, strict=False)
+                model.load_state_dict(state_dict, strict=False)
       </code></pre>
     </details>
 
