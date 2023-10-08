@@ -70,22 +70,30 @@ class Attention(nn.Module):
   </code></pre>
 </details>
 
-* Replace **contrastive_training.py** with the provided training code or set parameters **require_grad = True**:
-<details>
-  <summary>code</summary>
-  <pre><code>
-        for name, m in model.named_parameters():
-            if 'block' in name:
-                block_num = int(name.split('.')[1])
-                if block_num >= args.grad_from_block:
-                    m.requires_grad = True
-                if 'proj_v' in name:
-                    m.requires_grad = True
-                    torch.nn.init.zeros_(m)
-                if 'complex' in name:
-                    m.requires_grad = True
-  </code></pre>
-</details>
+* Replace **contrastive_training.py** with the provided training code 
+    * or set parameters **require_grad = True**:
+    <details>
+      <summary>code</summary>
+      <pre><code>
+            for name, m in model.named_parameters():
+                if 'block' in name:
+                    block_num = int(name.split('.')[1])
+                    if block_num >= args.grad_from_block:
+                        m.requires_grad = True
+                    if 'proj_v' in name:
+                        m.requires_grad = True
+                        torch.nn.init.zeros_(m)
+                    if 'complex' in name:
+                        m.requires_grad = True
+      </code></pre>
+    </details>
+    * and set **load_state_dict_strict=False**:
+    <details>
+      <summary>code</summary>
+      <pre><code>
+        model.load_state_dict(state_dict, strict=False)
+      </code></pre>
+    </details>
 
 * Start your SIEFormer
 
