@@ -338,14 +338,14 @@ if __name__ == "__main__":
             description='cluster',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--batch_size', default=40, type=int)
-    parser.add_argument('--num_workers', default=0, type=int)
+    parser.add_argument('--num_workers', default=8, type=int)
     parser.add_argument('--eval_funcs', nargs='+', help='Which eval functions to use', default=['v1', 'v2'])
 
     parser.add_argument('--warmup_model_dir', type=str, default=None)
     parser.add_argument('--model_name', type=str, default='vit_dino', help='Format is {model_name}_{pretrain}')
     parser.add_argument('--dataset_name', type=str, default='cifar100', help='options: cifar10, cifar100, scars')
     parser.add_argument('--prop_train_labels', type=float, default=0.5)
-    parser.add_argument('--use_ssb_splits', type=str2bool, default=False)
+    parser.add_argument('--use_ssb_splits', type=str2bool, default=True)
 
     parser.add_argument('--grad_from_block', type=int, default=11)
     parser.add_argument('--lr', type=float, default=0.0005)
