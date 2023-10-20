@@ -34,8 +34,8 @@ class Attention(nn.Module):
         self.scale = qk_scale or head_dim ** -0.5
         self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
         self.attn_drop = nn.Dropout(attn_drop)
-        self.proj_v1 = nn.Linear(dim, dim, bias=True)
-        self.proj_v2 = nn.Linear(dim, dim, bias=True)
+        self.proj_v1 = nn.Linear(dim, dim, bias=False)
+        self.proj_v2 = nn.Linear(dim, dim, bias=False)
         self.complex_weight = nn.Parameter(torch.cat((torch.ones(1, 1, 1, head_dim//2 + 1, 1), torch.zeros(1, 1, 1, head_dim//2 + 1, 1)), dim=4))
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
