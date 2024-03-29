@@ -38,6 +38,7 @@ sh scripts/run_${DATASET_NAME}.sh
 ```
 
 **Eval the model**
+
 Download the checkpoints and put them in the "checkpoints" folder and run:
 
 ```
