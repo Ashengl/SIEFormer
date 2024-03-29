@@ -214,7 +214,7 @@ if __name__ == "__main__":
     # INIT
     # ----------------------
     args = parser.parse_args()
-    device = torch.device('cuda:2')
+    device = torch.device('cuda:0')
     args = get_class_splits(args)
     args.num_labeled_classes = len(args.train_classes)
     args.num_unlabeled_classes = len(args.unlabeled_classes)
