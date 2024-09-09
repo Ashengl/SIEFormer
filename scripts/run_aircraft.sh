@@ -11,7 +11,7 @@ CUDA_VISIBLE_DEVICES=0 python train.py \
     --num_workers 8 \
     --use_ssb_splits \
     --sup_weight 0.35 \
-    --weight_decay 5e-6 \
+    --weight_decay 5e-5 \
     --transform 'imagenet' \
     --lr 0.1 \
     --eval_funcs 'v2' \
